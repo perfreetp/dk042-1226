@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { View, Text, Image, Input, Button, ScrollView } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidHide, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import { useMessageStore } from '@/stores/message';
 import { safetyTips } from '@/data/profiles';
@@ -12,11 +12,12 @@ const ChatPage: React.FC = () => {
   const targetId = router.params.targetId || '';
   const targetName = decodeURIComponent(router.params.targetName || '对方');
   const targetAvatar = decodeURIComponent(router.params.targetAvatar || 'https://picsum.photos/id/64/200/200');
+  const fromPage = router.params.from || '';
 
   const messages = useMessageStore(state => state.messages);
   const sendMessage = useMessageStore(state => state.sendMessage);
   const getOrCreateConversation = useMessageStore(state => state.getOrCreateConversation);
-  const markAsRead = useMessageStore(state => state.markAsRead);
+  const setActiveConversation = useMessageStore(state => state.setActiveConversation);
   const getMessages = useMessageStore(state => state.getMessages);
 
   const [inputText, setInputText] = useState('');
@@ -32,10 +33,39 @@ const ChatPage: React.FC = () => {
     return getMessages(convId);
   }, [messages, convId, getMessages]);
 
-  useEffect(() => {
+  useDidShow(() => {
+    setActiveConversation(convId);
     Taro.setNavigationBarTitle({ title: targetName });
-    markAsRead(convId);
-  }, [targetName, convId, markAsRead]);
+  });
+
+  useDidHide(() => {
+    setActiveConversation(null);
+  });
+
+  useEffect(() => {
+    setActiveConversation(convId);
+    Taro.setNavigationBarTitle({ title: targetName });
+    return () => {
+      setActiveConversation(null);
+    };
+  }, [targetName, convId, setActiveConversation]);
+
+  const handleBack = () => {
+    if (fromPage === 'profile') {
+      Taro.redirectTo({ url: '/pages/messages/index' });
+    } else {
+      Taro.navigateBack({ delta: 1 });
+    }
+  };
+
+  useEffect(() => {
+    if (fromPage === 'profile') {
+      // @ts-ignore
+      Taro.eventCenter && Taro.eventCenter.on && Taro.eventCenter.once('__taroNavigateBackInterceptor__', () => {
+        Taro.redirectTo({ url: '/pages/messages/index' });
+      });
+    }
+  }, [fromPage]);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -48,7 +78,7 @@ const ChatPage: React.FC = () => {
           animated: true
         });
       }
-    }, 200);
+    }, 300);
   };
 
   const handleQuickReply = (text: string) => {
@@ -71,6 +101,7 @@ const ChatPage: React.FC = () => {
         scrollY
         ref={scrollRef}
         scrollWithAnimation
+        scrollTop={99999}
       >
         {msgList.length > 0 ? (
           msgList.map((msg) => {

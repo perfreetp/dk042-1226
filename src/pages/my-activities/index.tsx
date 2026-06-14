@@ -9,13 +9,24 @@ import { RegisterStatus, MyRegistration } from '@/types/activity';
 import Tag from '@/components/Tag';
 import styles from './index.module.scss';
 
-const tabs = [
+const viewTabs = [
+  { value: 'status', label: '按状态', icon: '📊' },
+  { value: 'time', label: '按时间', icon: '📅' }
+];
+
+const statusTabs = [
   { value: 'all', label: '全部', icon: '📋' },
   { value: 'registered', label: '已报名', icon: '✅' },
   { value: 'waiting', label: '候补', icon: '⏳' },
   { value: 'checkedIn', label: '已签到', icon: '📍' },
   { value: 'completed', label: '已完成', icon: '🏆' },
   { value: 'cancelled', label: '已取消', icon: '❌' }
+];
+
+const timeGroups = [
+  { key: 'upcoming', label: '近期活动', icon: '🌟', desc: '即将开始或正在进行' },
+  { key: 'past', label: '已结束活动', icon: '📚', desc: '活动已完成归档' },
+  { key: 'cancelled', label: '已取消记录', icon: '🗑️', desc: '您取消过的报名' }
 ];
 
 const stageInfo = {
@@ -27,6 +38,7 @@ const stageInfo = {
 };
 
 const MyActivitiesPage: React.FC = () => {
+  const [viewMode, setViewMode] = useState<'status' | 'time'>('status');
   const [currentTab, setCurrentTab] = useState('all');
   const registrations = useActivityStore(state => state.registrations);
   const cancelRegistration = useActivityStore(state => state.cancelRegistration);
@@ -38,7 +50,33 @@ const MyActivitiesPage: React.FC = () => {
     archiveCompleted();
   });
 
-  const validRegs = useMemo(() => {
+  const today = dayjs();
+
+  const groupedByTime = useMemo(() => {
+    const groups: Record<string, MyRegistration[]> = {
+      upcoming: [],
+      past: [],
+      cancelled: []
+    };
+    registrations.forEach(reg => {
+      if (reg.status === 'cancelled') {
+        groups.cancelled.push(reg);
+      } else {
+        const activityDate = dayjs(reg.activity.date + ' ' + reg.activity.gatherTime);
+        if (activityDate.isAfter(today, 'minute')) {
+          groups.upcoming.push(reg);
+        } else {
+          groups.past.push(reg);
+        }
+      }
+    });
+    groups.upcoming.sort((a, b) => a.registerTime.localeCompare(b.registerTime));
+    groups.past.sort((a, b) => b.registerTime.localeCompare(a.registerTime));
+    groups.cancelled.sort((a, b) => b.registerTime.localeCompare(a.registerTime));
+    return groups;
+  }, [registrations, today]);
+
+  const statusValidRegs = useMemo(() => {
     const filtered = currentTab === 'all' ? registrations : registrations.filter(r => r.status === currentTab);
     return [...filtered].sort((a, b) => b.registerTime.localeCompare(a.registerTime));
   }, [registrations, currentTab]);
@@ -55,7 +93,7 @@ const MyActivitiesPage: React.FC = () => {
 
   const handleCardClick = (reg: MyRegistration) => {
     Taro.navigateTo({
-      url: `/pages/activity-detail/index?id=${reg.activityId}`
+      url: `/pages/registration-detail/index?id=${reg.id}`
     });
   };
 
@@ -286,94 +324,186 @@ const MyActivitiesPage: React.FC = () => {
           </View>
         </View>
 
-        <View className={styles.tabBar}>
-          {tabs.map((t) => (
+        <View className={styles.viewTabs}>
+          {viewTabs.map((t) => (
             <View
               key={t.value}
-              className={classnames(styles.tabItem, currentTab === t.value && styles.active)}
-              onClick={() => setCurrentTab(t.value)}
+              className={classnames(styles.viewTabItem, viewMode === t.value && styles.viewActive)}
+              onClick={() => setViewMode(t.value as any)}
             >
-              <Text className={styles.tabIcon}>{t.icon}</Text>
-              <Text className={styles.tabText}>{t.label}</Text>
+              <Text className={styles.viewTabIcon}>{t.icon}</Text>
+              <Text className={styles.viewTabText}>{t.label}</Text>
             </View>
           ))}
         </View>
 
-        <View className={styles.listWrapper}>
-          {validRegs.length > 0 ? (
-            validRegs.map((reg) => (
+        {viewMode === 'status' && (
+          <View className={styles.tabBar}>
+            {statusTabs.map((t) => (
               <View
-                key={reg.id}
-                className={classnames(styles.regCard, reg.status === 'cancelled' && styles.cardCancelled)}
-                onClick={() => handleCardClick(reg)}
+                key={t.value}
+                className={classnames(styles.tabItem, currentTab === t.value && styles.active)}
+                onClick={() => setCurrentTab(t.value)}
               >
-                <View className={styles.cardCover}>
-                  <Image
-                    className={styles.coverImage}
-                    src={reg.activity.coverImage}
-                    mode="aspectFill"
-                  />
-                  <View className={styles.typeTag}>
-                    <Tag text={activityTypeTextMap[reg.activity.type]} type={reg.activity.type as any} size="sm" />
-                  </View>
-                  <View
-                    className={styles.statusBadgeBig}
-                    style={{ backgroundColor: `${statusColorMap[reg.status]}30` }}
-                  >
-                    <Text
-                      className={styles.statusTextBig}
-                      style={{ color: statusColorMap[reg.status] }}
-                    >
-                      {statusTextMap[reg.status]}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className={styles.cardContent}>
-                  <View className={styles.cardTop}>
-                    <Text className={styles.title}>{reg.activity.title}</Text>
-                  </View>
-
-                  {renderStage(reg)}
-
-                  <View className={styles.infoRow}>
-                    <Text className={styles.infoText}>📍 {reg.activity.city} · {reg.activity.location}</Text>
-                  </View>
-                  <View className={styles.infoRow}>
-                    <Text className={styles.infoText}>📅 {reg.activity.date} {reg.activity.gatherTime}集合</Text>
-                  </View>
-                  <View className={styles.infoRow}>
-                    <Text className={styles.infoText}>
-                      💰 {reg.activity.fee > 0 ? `¥${reg.activity.fee}/人` : '免费活动'}
-                      {'  · 👥 '}{reg.activity.registeredPeople}/{reg.activity.maxPeople}人
-                      {reg.activity.waitingPeople > 0 && ` · ⏳候补${reg.activity.waitingPeople}`}
-                    </Text>
-                  </View>
-                  <View className={styles.infoRow}>
-                    <Text className={styles.infoText}>
-                      👗 服饰要求：{reg.activity.dressCode}
-                    </Text>
-                  </View>
-
-                  <View className={styles.timeRow}>
-                    <Text className={styles.regTime}>报名时间：{reg.registerTime}</Text>
-                    {reg.checkInTime && (
-                      <Text className={styles.checkInTime}>✓ 签到于 {reg.checkInTime}</Text>
-                    )}
-                  </View>
-
-                  {renderActions(reg)}
-                </View>
+                <Text className={styles.tabIcon}>{t.icon}</Text>
+                <Text className={styles.tabText}>{t.label}</Text>
               </View>
-            ))
+            ))}
+          </View>
+        )}
+
+        <View className={styles.listWrapper}>
+          {viewMode === 'status' ? (
+            statusValidRegs.length > 0 ? (
+              statusValidRegs.map((reg) => (
+                <View
+                  key={reg.id}
+                  className={classnames(styles.regCard, reg.status === 'cancelled' && styles.cardCancelled)}
+                  onClick={() => handleCardClick(reg)}
+                >
+                  <View className={styles.cardCover}>
+                    <Image
+                      className={styles.coverImage}
+                      src={reg.activity.coverImage}
+                      mode="aspectFill"
+                    />
+                    <View className={styles.typeTag}>
+                      <Tag text={activityTypeTextMap[reg.activity.type]} type={reg.activity.type as any} size="sm" />
+                    </View>
+                    <View
+                      className={styles.statusBadgeBig}
+                      style={{ backgroundColor: `${statusColorMap[reg.status]}30` }}
+                    >
+                      <Text
+                        className={styles.statusTextBig}
+                        style={{ color: statusColorMap[reg.status] }}
+                      >
+                        {statusTextMap[reg.status]}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className={styles.cardContent}>
+                    <View className={styles.cardTop}>
+                      <Text className={styles.title}>{reg.activity.title}</Text>
+                    </View>
+
+                    {renderStage(reg)}
+
+                    <View className={styles.infoRow}>
+                      <Text className={styles.infoText}>📍 {reg.activity.city} · {reg.activity.location}</Text>
+                    </View>
+                    <View className={styles.infoRow}>
+                      <Text className={styles.infoText}>📅 {reg.activity.date} {reg.activity.gatherTime}集合</Text>
+                    </View>
+                    <View className={styles.infoRow}>
+                      <Text className={styles.infoText}>
+                        💰 {reg.activity.fee > 0 ? `¥${reg.activity.fee}/人` : '免费活动'}
+                        {'  · 👥 '}{reg.activity.registeredPeople}/{reg.activity.maxPeople}人
+                        {reg.activity.waitingPeople > 0 && ` · ⏳候补${reg.activity.waitingPeople}`}
+                      </Text>
+                    </View>
+                    <View className={styles.infoRow}>
+                      <Text className={styles.infoText}>
+                        👗 服饰要求：{reg.activity.dressCode}
+                      </Text>
+                    </View>
+
+                    <View className={styles.timeRow}>
+                      <Text className={styles.regTime}>报名时间：{reg.registerTime}</Text>
+                      {reg.checkInTime && (
+                        <Text className={styles.checkInTime}>✓ 签到于 {reg.checkInTime}</Text>
+                      )}
+                    </View>
+
+                    {renderActions(reg)}
+                  </View>
+                </View>
+              ))
+            ) : (
+              <View className={styles.emptyBox}>
+                <Text className={styles.emptyIcon}>📭</Text>
+                <Text className={styles.emptyTitle}>
+                  暂无{currentTab === 'all' ? '' : statusTabs.find(t => t.value === currentTab)?.label}报名记录
+                </Text>
+                <Text className={styles.emptyDesc}>去首页发现更多精彩活动吧~</Text>
+              </View>
+            )
           ) : (
-            <View style={{ padding: '120rpx 0', textAlign: 'center' }}>
-              <Text style={{ fontSize: '80rpx', display: 'block', marginBottom: '24rpx' }}>📭</Text>
-              <Text style={{ fontSize: '30rpx', color: '#A09383', display: 'block', marginBottom: '12rpx' }}>
-                暂无{tab === 'all' ? '' : tabs.find(t => t.value === currentTab)?.label}报名记录
-              </Text>
-              <Text style={{ fontSize: '24rpx', color: '#C9C0B3' }}>去首页发现更多精彩活动吧~</Text>
-            </View>
+            timeGroups.map((group) => {
+              const list = groupedByTime[group.key] || [];
+              return (
+                <View key={group.key} className={styles.timeGroupBlock}>
+                  <View className={styles.timeGroupHeader}>
+                    <Text className={styles.timeGroupIcon}>{group.icon}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text className={styles.timeGroupTitle}>{group.label}</Text>
+                      <Text className={styles.timeGroupDesc}>{group.desc}</Text>
+                    </View>
+                    <View className={styles.timeGroupCount}>
+                      <Text className={styles.timeGroupCountText}>{list.length}</Text>
+                    </View>
+                  </View>
+
+                  {list.length > 0 ? (
+                    list.map((reg) => (
+                      <View
+                        key={reg.id}
+                        className={classnames(styles.regCard, reg.status === 'cancelled' && styles.cardCancelled)}
+                        onClick={() => handleCardClick(reg)}
+                      >
+                        <View className={styles.cardCover}>
+                          <Image
+                            className={styles.coverImage}
+                            src={reg.activity.coverImage}
+                            mode="aspectFill"
+                          />
+                          <View className={styles.typeTag}>
+                            <Tag text={activityTypeTextMap[reg.activity.type]} type={reg.activity.type as any} size="sm" />
+                          </View>
+                          <View
+                            className={styles.statusBadgeBig}
+                            style={{ backgroundColor: `${statusColorMap[reg.status]}30` }}
+                          >
+                            <Text
+                              className={styles.statusTextBig}
+                              style={{ color: statusColorMap[reg.status] }}
+                            >
+                              {statusTextMap[reg.status]}
+                            </Text>
+                          </View>
+                        </View>
+
+                        <View className={styles.cardContent}>
+                          <View className={styles.cardTop}>
+                            <Text className={styles.title}>{reg.activity.title}</Text>
+                          </View>
+
+                          {renderStage(reg)}
+
+                          <View className={styles.infoRow}>
+                            <Text className={styles.infoText}>📍 {reg.activity.city} · {reg.activity.location}</Text>
+                          </View>
+                          <View className={styles.infoRow}>
+                            <Text className={styles.infoText}>📅 {reg.activity.date} {reg.activity.gatherTime}集合</Text>
+                          </View>
+                          <View className={styles.timeRow}>
+                            <Text className={styles.regTime}>报名时间：{reg.registerTime}</Text>
+                            {reg.checkInTime && (
+                              <Text className={styles.checkInTime}>✓ 签到于 {reg.checkInTime}</Text>
+                            )}
+                          </View>
+                        </View>
+                      </View>
+                    ))
+                  ) : (
+                    <View className={styles.emptyGroup}>
+                      <Text className={styles.emptyGroupText}>暂无记录</Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })
           )}
         </View>
       </View>

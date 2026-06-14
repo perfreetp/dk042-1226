@@ -129,9 +129,10 @@ export const useActivityStore = create<ActivityState>()(
           if (waitingList.length === 0) break;
 
           const firstWaiting = waitingList[0];
+          const now = new Date().toLocaleString('zh-CN');
           registrations = registrations.map(r => {
             if (r.id === firstWaiting.id) {
-              return { ...r, status: 'registered' as RegisterStatus };
+              return { ...r, status: 'registered' as RegisterStatus, promotedTime: now };
             }
             return r;
           });
@@ -168,7 +169,7 @@ export const useActivityStore = create<ActivityState>()(
 
         let newRegistrations = state.registrations.map(r =>
           r.id === registrationId
-            ? { ...r, status: 'cancelled' as RegisterStatus }
+            ? { ...r, status: 'cancelled' as RegisterStatus, cancelTime: new Date().toLocaleString('zh-CN') }
             : r
         );
 

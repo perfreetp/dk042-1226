@@ -15,20 +15,22 @@ const ActivityDetailPage: React.FC = () => {
   const id = router.params.id || '1';
 
   const activities = useActivityStore(state => state.activities);
+  const registrations = useActivityStore(state => state.registrations);
   const registerActivity = useActivityStore(state => state.registerActivity);
   const joinWaiting = useActivityStore(state => state.joinWaiting);
   const cancelRegistration = useActivityStore(state => state.cancelRegistration);
   const checkIn = useActivityStore(state => state.checkIn);
   const uploadAlbum = useActivityStore(state => state.uploadAlbum);
-  const getRegistrationByActivityId = useActivityStore(state => state.getRegistrationByActivityId);
 
   const activity = useMemo(() => {
     return activities.find(a => a.id === id) || activities[0];
   }, [activities, id]);
 
   const registration = useMemo(() => {
-    return getRegistrationByActivityId(id);
-  }, [getRegistrationByActivityId, id]);
+    return registrations.find(
+      r => r.activityId === id && r.status !== 'cancelled'
+    );
+  }, [registrations, id]);
 
   const registerState: RegisterState = registration ? registration.status : 'none';
 

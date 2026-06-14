@@ -28,6 +28,7 @@ const PhotoshootDetailPage: React.FC = () => {
   const incrementView = usePhotoshootStore(state => state.incrementView);
   const isMyPhotoshoot = usePhotoshootStore(state => state.isMyPhotoshoot);
   const removePhotoshoot = usePhotoshootStore(state => state.removePhotoshoot);
+  const relistPhotoshoot = usePhotoshootStore(state => state.relistPhotoshoot);
 
   const photoshoot = useMemo(() => {
     if (id) {
@@ -83,7 +84,25 @@ const PhotoshootDetailPage: React.FC = () => {
         const result = removePhotoshoot(photoshoot.id);
         if (result.success) {
           Taro.showToast({ title: result.message, icon: 'success' });
-          setTimeout(() => Taro.navigateBack(), 800);
+        } else {
+          Taro.showToast({ title: result.message, icon: 'none' });
+        }
+      }
+    }).catch(() => {});
+  };
+
+  const handleRelist = () => {
+    if (!photoshoot) return;
+    Taro.showModal({
+      title: '重新上架',
+      content: '确定要重新上架这条约拍信息吗？上架后其他用户可正常看到。',
+      confirmText: '确认上架',
+      confirmColor: '#8B4557'
+    }).then((res) => {
+      if (res.confirm) {
+        const result = relistPhotoshoot(photoshoot.id);
+        if (result.success) {
+          Taro.showToast({ title: result.message, icon: 'success' });
         } else {
           Taro.showToast({ title: result.message, icon: 'none' });
         }
@@ -201,11 +220,15 @@ const PhotoshootDetailPage: React.FC = () => {
             >查看联系方式</Button>
             <View className={styles.rightBtns}>
               <Button
-                className={classnames(styles.actionBtn, styles.warning, isRemoved && styles.disabled)}
+                className={classnames(styles.actionBtn, styles.warning)}
                 onClick={handleEdit}
-                disabled={isRemoved}
               >编辑</Button>
-              {!isRemoved && (
+              {isRemoved ? (
+                <Button
+                  className={classnames(styles.actionBtn, styles.primary)}
+                  onClick={handleRelist}
+                >重新上架</Button>
+              ) : (
                 <Button
                   className={classnames(styles.actionBtn, styles.danger)}
                   onClick={handleRemove}

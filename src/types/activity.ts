@@ -34,4 +34,6 @@ export interface MyRegistration {
   status: RegisterStatus;
   registerTime: string;
   checkInTime?: string;
+  promotedTime?: string;
+  cancelTime?: string;
 }

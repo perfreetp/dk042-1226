@@ -46,6 +46,10 @@ const SquarePage: React.FC = () => {
     Taro.navigateTo({ url: '/pages/publish/index' });
   };
 
+  const handleMyPublish = () => {
+    Taro.navigateTo({ url: '/pages/my-photoshoot/index' });
+  };
+
   const handleCardClick = (p: Photoshoot) => {
     Taro.navigateTo({
       url: `/pages/photoshoot-detail/index?id=${p.id}`
@@ -60,6 +64,17 @@ const SquarePage: React.FC = () => {
           <Text className={styles.safetyText}>
             {safetyTips[0]}；首次见面请选择公共场所，保护好个人隐私。
           </Text>
+        </View>
+
+        <View className={styles.quickBar}>
+          <View className={styles.quickItem} onClick={handleMyPublish}>
+            <Text className={styles.quickIcon}>📝</Text>
+            <Text className={styles.quickText}>我的发布</Text>
+          </View>
+          <View className={styles.quickItem} onClick={handlePublish}>
+            <Text className={styles.quickIcon}>➕</Text>
+            <Text className={styles.quickText}>发布约拍</Text>
+          </View>
         </View>
 
         <View className={styles.tabBar}>

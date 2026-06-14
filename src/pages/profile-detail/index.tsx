@@ -21,8 +21,14 @@ const ProfileDetailPage: React.FC = () => {
   const [isBlocked, setIsBlocked] = useState(false);
 
   const handleMessage = () => {
-    Taro.navigateTo({
-      url: `/pages/chat/index?targetId=${profile.id}&targetName=${encodeURIComponent(profile.name)}&targetAvatar=${encodeURIComponent(profile.avatar)}`
+    const chatUrl = `/pages/chat/index?targetId=${profile.id}&targetName=${encodeURIComponent(profile.name)}&targetAvatar=${encodeURIComponent(profile.avatar)}`;
+    Taro.redirectTo({
+      url: '/pages/messages/index',
+      success: () => {
+        setTimeout(() => {
+          Taro.navigateTo({ url: chatUrl });
+        }, 50);
+      }
     });
   };
 

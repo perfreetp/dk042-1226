@@ -5,6 +5,8 @@ import { Message, Conversation } from '@/types/message';
 interface MessageState {
   conversations: Conversation[];
   messages: Record<string, Message[]>;
+  activeConversationId: string | null;
+  setActiveConversation: (id: string | null) => void;
   sendMessage: (conversationId: string, targetId: string, targetName: string, targetAvatar: string, content: string) => void;
   getOrCreateConversation: (targetId: string, targetName: string, targetAvatar: string) => Conversation;
   getMessages: (conversationId: string) => Message[];
@@ -95,6 +97,15 @@ export const useMessageStore = create<MessageState>()(
     (set, get) => ({
       conversations: mockConversations,
       messages: mockMessages,
+      activeConversationId: null,
+
+      setActiveConversation: (id: string | null) => {
+        set({ activeConversationId: id });
+        if (id) {
+          const state = get();
+          state.markAsRead(id);
+        }
+      },
 
       getOrCreateConversation: (targetId: string, targetName: string, targetAvatar: string) => {
         const state = get();
@@ -175,9 +186,13 @@ export const useMessageStore = create<MessageState>()(
             '没问题的呀',
             '可以的，我们约个时间吧',
             '嗯嗯，我这边可以的',
-            '好呀好呀，期待合作！'
+            '好呀好呀，期待合作！',
+            '明白了，稍后我把资料发给你',
+            '可以加个微信详细聊吗？'
           ];
           const replyContent = replies[Math.floor(Math.random() * replies.length)];
+
+          const isActive = s.activeConversationId === conversationId;
 
           const replyMessage: Message = {
             id: `m_${Date.now()}_reply`,
@@ -187,7 +202,7 @@ export const useMessageStore = create<MessageState>()(
             senderAvatar: targetAvatar,
             content: replyContent,
             createTime: replyTime,
-            isRead: false
+            isRead: isActive
           };
 
           const currentMsgs = s.messages[conversationId] || [];
@@ -198,7 +213,7 @@ export const useMessageStore = create<MessageState>()(
             },
             conversations: s.conversations.map(c =>
               c.id === conversationId
-                ? { ...c, lastMessage: replyContent, lastMessageTime: replyTime, unreadCount: c.unreadCount + 1 }
+                ? { ...c, lastMessage: replyContent, lastMessageTime: replyTime, unreadCount: isActive ? 0 : c.unreadCount + 1 }
                 : c
             )
           });
@@ -226,7 +241,11 @@ export const useMessageStore = create<MessageState>()(
       }
     }),
     {
-      name: 'hanfu-message-storage'
+      name: 'hanfu-message-storage',
+      partialize: (state) => ({
+        conversations: state.conversations,
+        messages: state.messages
+      })
     }
   )
 );

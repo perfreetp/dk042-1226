@@ -106,3 +106,35 @@
   color: $color-text-secondary;
   line-height: 1.7;
 }
+
+.quickBar {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.quickItem {
+  flex: 1;
+  height: 96rpx;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  @include flex-center;
+  gap: $spacing-xs;
+  box-shadow: $shadow-card;
+  transition: all $transition-fast;
+
+  .quickIcon {
+    font-size: 36rpx;
+  }
+
+  .quickText {
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+    font-weight: $font-weight-medium;
+  }
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}

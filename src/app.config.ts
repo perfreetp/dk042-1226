@@ -10,7 +10,9 @@ export default defineAppConfig({
     'pages/profile-detail/index',
     'pages/messages/index',
     'pages/chat/index',
-    'pages/photoshoot-detail/index'
+    'pages/photoshoot-detail/index',
+    'pages/registration-detail/index',
+    'pages/my-photoshoot/index'
   ],
   window: {
     backgroundTextStyle: 'light',
