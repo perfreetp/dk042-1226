@@ -8,6 +8,7 @@ import styles from './index.module.scss';
 interface PhotoshootCardProps {
   photoshoot: Photoshoot;
   onClick?: () => void;
+  isMine?: boolean;
 }
 
 const roleTagTypeMap: Record<string, 'primary' | 'success' | 'warning'> = {
@@ -16,7 +17,7 @@ const roleTagTypeMap: Record<string, 'primary' | 'success' | 'warning'> = {
   model: 'warning'
 };
 
-const PhotoshootCard: React.FC<PhotoshootCardProps> = ({ photoshoot, onClick }) => {
+const PhotoshootCard: React.FC<PhotoshootCardProps> = ({ photoshoot, onClick, isMine }) => {
   return (
     <View className={styles.card} onClick={onClick}>
       <View className={styles.header}>
@@ -26,7 +27,10 @@ const PhotoshootCard: React.FC<PhotoshootCardProps> = ({ photoshoot, onClick }) 
           mode="aspectFill"
         />
         <View className={styles.authorInfo}>
-          <Text className={styles.authorName}>{photoshoot.author.name}</Text>
+          <View className={styles.nameRow}>
+            <Text className={styles.authorName}>{photoshoot.author.name}</Text>
+            {isMine && <View className={styles.mineBadge}><Text className={styles.mineText}>我发布的</Text></View>}
+          </View>
           <View className={styles.authorMeta}>
             <Tag text={shootRoleTextMap[photoshoot.role]} type={roleTagTypeMap[photoshoot.role]} size="sm" />
             <Text className={styles.cityText}>{photoshoot.city}</Text>

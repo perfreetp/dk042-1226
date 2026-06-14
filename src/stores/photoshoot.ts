@@ -6,9 +6,15 @@ import { photoshoots as mockPhotoshoots } from '@/data/photoshoots';
 interface PhotoshootState {
   photoshoots: Photoshoot[];
   addPhotoshoot: (data: Omit<Photoshoot, 'id' | 'createTime' | 'viewCount' | 'author'> & { authorName: string }) => { success: boolean; message: string; id: string };
-  getPhotoshootsByRole: (role: ShootRole | 'all') => Photoshoot[];
+  updatePhotoshoot: (id: string, data: Partial<Photoshoot>) => { success: boolean; message: string };
+  removePhotoshoot: (id: string) => { success: boolean; message: string };
+  incrementView: (id: string) => void;
+  getPhotoshootsByRole: (role: ShootRole | 'all', showRemoved?: boolean) => Photoshoot[];
   getPhotoshootById: (id: string) => Photoshoot | undefined;
+  isMyPhotoshoot: (id: string) => boolean;
 }
+
+const myUserId = 'me';
 
 export const usePhotoshootStore = create<PhotoshootState>()(
   persist(
@@ -22,7 +28,7 @@ export const usePhotoshootStore = create<PhotoshootState>()(
           title: data.title,
           coverImage: data.coverImage,
           author: {
-            id: 'me',
+            id: myUserId,
             name: data.authorName || '我',
             avatar: 'https://picsum.photos/id/64/200/200'
           },
@@ -33,7 +39,8 @@ export const usePhotoshootStore = create<PhotoshootState>()(
           style: data.style,
           contact: data.contact,
           createTime: new Date().toLocaleString('zh-CN'),
-          viewCount: 0
+          viewCount: 0,
+          status: 'active'
         };
 
         set({
@@ -43,13 +50,57 @@ export const usePhotoshootStore = create<PhotoshootState>()(
         return { success: true, message: '发布成功', id: newPhotoshoot.id };
       },
 
-      getPhotoshootsByRole: (role: ShootRole | 'all') => {
-        if (role === 'all') return get().photoshoots;
-        return get().photoshoots.filter(p => p.role === role);
+      updatePhotoshoot: (id: string, data: Partial<Photoshoot>) => {
+        const state = get();
+        const p = state.photoshoots.find(x => x.id === id);
+        if (!p) return { success: false, message: '约拍不存在' };
+        if (p.author.id !== myUserId) return { success: false, message: '只能编辑自己发布的内容' };
+
+        set({
+          photoshoots: state.photoshoots.map(x =>
+            x.id === id ? { ...x, ...data, updateTime: new Date().toLocaleString('zh-CN') } : x
+          )
+        });
+
+        return { success: true, message: '修改成功' };
+      },
+
+      removePhotoshoot: (id: string) => {
+        const state = get();
+        const p = state.photoshoots.find(x => x.id === id);
+        if (!p) return { success: false, message: '约拍不存在' };
+        if (p.author.id !== myUserId) return { success: false, message: '只能下架自己发布的内容' };
+
+        set({
+          photoshoots: state.photoshoots.map(x =>
+            x.id === id ? { ...x, status: 'removed', removeTime: new Date().toLocaleString('zh-CN') } : x
+          )
+        });
+
+        return { success: true, message: '已下架' };
+      },
+
+      incrementView: (id: string) => {
+        set({
+          photoshoots: get().photoshoots.map(p =>
+            p.id === id ? { ...p, viewCount: p.viewCount + 1 } : p
+          )
+        });
+      },
+
+      getPhotoshootsByRole: (role: ShootRole | 'all', showRemoved = false) => {
+        let list = get().photoshoots.filter(p => showRemoved || p.status !== 'removed');
+        if (role !== 'all') list = list.filter(p => p.role === role);
+        return list;
       },
 
       getPhotoshootById: (id: string) => {
         return get().photoshoots.find(p => p.id === id);
+      },
+
+      isMyPhotoshoot: (id: string) => {
+        const p = get().getPhotoshootById(id);
+        return p ? p.author.id === myUserId : false;
       }
     }),
     {

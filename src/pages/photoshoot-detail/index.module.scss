@@ -1,0 +1,290 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+.scroll {
+  height: 100%;
+}
+
+.coverWrap {
+  position: relative;
+  width: 100%;
+  height: 420rpx;
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+}
+
+.roleBadge {
+  position: absolute;
+  bottom: $spacing-md;
+  left: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 20rpx;
+  border-radius: $radius-button;
+  backdrop-filter: blur(8px);
+
+  .roleIcon {
+    font-size: 28rpx;
+  }
+
+  .roleText {
+    font-size: $font-size-sm;
+    color: $color-text-white;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.removedMask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  @include flex-center;
+
+  .removedText {
+    padding: 16rpx 48rpx;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: $color-text-white;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    border-radius: $radius-button;
+    letter-spacing: 8rpx;
+  }
+}
+
+.content {
+  padding: $spacing-md $page-padding $spacing-xl;
+  margin-top: -40rpx;
+  position: relative;
+}
+
+.headerCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.title {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.4;
+  margin-bottom: $spacing-md;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+
+  .metaIcon {
+    font-size: $font-size-sm;
+  }
+
+  .metaText {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.authorCard {
+  display: flex;
+  align-items: center;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+
+  &:active {
+    background-color: rgba($color-primary, 0.04);
+  }
+}
+
+.authorAvatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.authorInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.authorName {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+
+  .mineTag {
+    font-size: $font-size-xs;
+    color: $color-primary;
+    font-weight: $font-weight-normal;
+    margin-left: 8rpx;
+  }
+}
+
+.authorSub {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.arrowIcon {
+  font-size: 48rpx;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-normal;
+}
+
+.sectionCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.descText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.safetyList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.safetyItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+
+  .safetyDot {
+    color: $color-warning;
+    font-size: $font-size-sm;
+    line-height: 1.6;
+    flex-shrink: 0;
+  }
+
+  .safetyText {
+    flex: 1;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $page-padding;
+  padding-bottom: calc($spacing-sm + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  border-top: 1rpx solid $color-divider;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+  gap: $spacing-sm;
+}
+
+.rightBtns {
+  display: flex;
+  gap: $spacing-sm;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.actionBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  padding: 0 $spacing-xl;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+  flex: 1;
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    color: $color-text-white;
+    flex: 1.5;
+  }
+
+  &.outline {
+    background-color: transparent;
+    border: 1rpx solid $color-border;
+    color: $color-text-secondary;
+  }
+
+  &.success {
+    background: linear-gradient(135deg, $color-success 0%, lighten($color-success, 10%) 100%);
+    color: $color-text-white;
+  }
+
+  &.warning {
+    background: linear-gradient(135deg, $color-warning 0%, lighten($color-warning, 8%) 100%);
+    color: $color-text-white;
+    flex: 0 0 auto;
+  }
+
+  &.danger {
+    background: linear-gradient(135deg, $color-error 0%, lighten($color-error, 10%) 100%);
+    color: $color-text-white;
+    flex: 0 0 auto;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+  }
+
+  &:active:not(.disabled) {
+    opacity: 0.85;
+    transform: scale(0.96);
+  }
+}

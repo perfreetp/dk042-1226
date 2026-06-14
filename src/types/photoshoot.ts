@@ -1,4 +1,5 @@
 export type ShootRole = 'photographer' | 'stylist' | 'model';
+export type ShootStatus = 'active' | 'removed';
 
 export interface Photoshoot {
   id: string;
@@ -18,4 +19,7 @@ export interface Photoshoot {
   contact: string;
   createTime: string;
   viewCount: number;
+  status?: ShootStatus;
+  updateTime?: string;
+  removeTime?: string;
 }

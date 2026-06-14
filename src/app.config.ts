@@ -9,7 +9,8 @@ export default defineAppConfig({
     'pages/publish/index',
     'pages/profile-detail/index',
     'pages/messages/index',
-    'pages/chat/index'
+    'pages/chat/index',
+    'pages/photoshoot-detail/index'
   ],
   window: {
     backgroundTextStyle: 'light',

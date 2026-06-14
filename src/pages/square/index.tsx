@@ -17,23 +17,39 @@ const tabs = [
   { value: 'model', label: '模特' }
 ];
 
+const myUserId = 'me';
+
 const SquarePage: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('all');
   const [currentCity, setCurrentCity] = useState('全部');
+  const [, forceRefresh] = useState(0);
   const photoshoots = usePhotoshootStore(state => state.photoshoots);
 
+  useDidShow(() => {
+    forceRefresh(n => n + 1);
+  });
+
   const filteredShoots = useMemo(() => {
-    return photoshoots.filter((p: Photoshoot) => {
-      const tabMatch = currentTab === 'all' || p.role === currentTab;
-      const cityMatch = currentCity === '全部' || p.city === currentCity;
-      return tabMatch && cityMatch;
-    });
+    return photoshoots
+      .filter((p: Photoshoot) => p.status !== 'removed')
+      .filter((p: Photoshoot) => {
+        const tabMatch = currentTab === 'all' || p.role === currentTab;
+        const cityMatch = currentCity === '全部' || p.city === currentCity;
+        return tabMatch && cityMatch;
+      })
+      .sort((a, b) => b.createTime.localeCompare(a.createTime));
   }, [photoshoots, currentTab, currentCity]);
 
   const cityOptions = cities.map((c) => ({ value: c, label: c }));
 
   const handlePublish = () => {
     Taro.navigateTo({ url: '/pages/publish/index' });
+  };
+
+  const handleCardClick = (p: Photoshoot) => {
+    Taro.navigateTo({
+      url: `/pages/photoshoot-detail/index?id=${p.id}`
+    });
   };
 
   return (
@@ -70,11 +86,20 @@ const SquarePage: React.FC = () => {
         <View className={styles.listWrapper}>
           {filteredShoots.length > 0 ? (
             filteredShoots.map((p) => (
-              <PhotoshootCard key={p.id} photoshoot={p} />
+              <PhotoshootCard
+                key={p.id}
+                photoshoot={p}
+                isMine={p.author.id === myUserId}
+                onClick={() => handleCardClick(p)}
+              />
             ))
           ) : (
-            <View style={{ padding: '80rpx 0', textAlign: 'center' }}>
-              <Text style={{ fontSize: '28rpx', color: '#A09383' }}>暂无符合条件的约拍信息</Text>
+            <View style={{ padding: '120rpx 0', textAlign: 'center' }}>
+              <Text style={{ fontSize: '80rpx', display: 'block', marginBottom: '24rpx' }}>📷</Text>
+              <Text style={{ fontSize: '28rpx', color: '#A09383', display: 'block', marginBottom: '12rpx' }}>
+                暂无符合条件的约拍信息
+              </Text>
+              <Text style={{ fontSize: '24rpx', color: '#C9C0B3' }}>点击右下角按钮发布一条吧~</Text>
             </View>
           )}
         </View>

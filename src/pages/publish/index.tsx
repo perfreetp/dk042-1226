@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, Input, Textarea, Button } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
 import { ShootRole } from '@/types/photoshoot';
 import { usePhotoshootStore } from '@/stores/photoshoot';
@@ -27,6 +27,12 @@ const roleCoverImages: Record<ShootRole, string> = {
 };
 
 const PublishPage: React.FC = () => {
+  const router = useRouter();
+  const editId = router.params.editId || '';
+  const photoshoots = usePhotoshootStore(state => state.photoshoots);
+  const addPhotoshoot = usePhotoshootStore(state => state.addPhotoshoot);
+  const updatePhotoshoot = usePhotoshootStore(state => state.updatePhotoshoot);
+
   const [role, setRole] = useState<ShootRole>('photographer');
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');
@@ -35,7 +41,27 @@ const PublishPage: React.FC = () => {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [description, setDescription] = useState('');
   const [contact, setContact] = useState('');
-  const addPhotoshoot = usePhotoshootStore(state => state.addPhotoshoot);
+
+  const isEdit = !!editId;
+
+  useEffect(() => {
+    if (editId) {
+      const p = photoshoots.find(x => x.id === editId);
+      if (p) {
+        setRole(p.role);
+        setTitle(p.title);
+        setCity(p.city);
+        setDate(p.date);
+        setBudget(p.budget);
+        setSelectedStyles(p.style);
+        setDescription(p.description);
+        setContact(p.contact);
+        Taro.setNavigationBarTitle({ title: '编辑约拍' });
+      }
+    } else {
+      Taro.setNavigationBarTitle({ title: '发布约拍' });
+    }
+  }, [editId, photoshoots]);
 
   const canSubmit = title.trim() && city.trim() && date.trim() && budget.trim() && contact.trim();
 
@@ -63,34 +89,55 @@ const PublishPage: React.FC = () => {
       Taro.showToast({ title: '请完善必填信息', icon: 'none' });
       return;
     }
+    const actionText = isEdit ? '修改' : '发布';
     Taro.showModal({
-      title: '确认发布',
-      content: '发布后所有用户均可看到该信息，请确保填写内容真实有效。',
+      title: `确认${actionText}`,
+      content: `确认${actionText}该约拍信息吗？`,
       confirmColor: '#8B4557'
     }).then((res) => {
       if (res.confirm) {
-        Taro.showLoading({ title: '发布中...' });
-        const result = addPhotoshoot({
-          role,
-          title: title.trim(),
-          coverImage: roleCoverImages[role],
-          city: city.trim(),
-          date: date.trim(),
-          budget: budget.trim(),
-          description: description.trim() || '暂无详细描述',
-          style: selectedStyles.length > 0 ? selectedStyles : ['汉服'],
-          contact: contact.trim(),
-          authorName: '我'
-        });
-        setTimeout(() => {
-          Taro.hideLoading();
-          Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
-          if (result.success) {
-            setTimeout(() => {
-              Taro.navigateBack();
-            }, 1000);
-          }
-        }, 600);
+        Taro.showLoading({ title: `${actionText}中...` });
+
+        if (isEdit) {
+          const result = updatePhotoshoot(editId, {
+            role,
+            title: title.trim(),
+            coverImage: roleCoverImages[role],
+            city: city.trim(),
+            date: date.trim(),
+            budget: budget.trim(),
+            description: description.trim() || '暂无详细描述',
+            style: selectedStyles.length > 0 ? selectedStyles : ['汉服'],
+            contact: contact.trim()
+          });
+          setTimeout(() => {
+            Taro.hideLoading();
+            Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
+            if (result.success) {
+              setTimeout(() => Taro.navigateBack(), 800);
+            }
+          }, 500);
+        } else {
+          const result = addPhotoshoot({
+            role,
+            title: title.trim(),
+            coverImage: roleCoverImages[role],
+            city: city.trim(),
+            date: date.trim(),
+            budget: budget.trim(),
+            description: description.trim() || '暂无详细描述',
+            style: selectedStyles.length > 0 ? selectedStyles : ['汉服'],
+            contact: contact.trim(),
+            authorName: '我'
+          });
+          setTimeout(() => {
+            Taro.hideLoading();
+            Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
+            if (result.success) {
+              setTimeout(() => Taro.navigateBack(), 800);
+            }
+          }, 600);
+        }
       }
     }).catch(() => {});
   };
@@ -98,7 +145,9 @@ const PublishPage: React.FC = () => {
   return (
     <View className={styles.page}>
       <View className={styles.content}>
-        <Text className={styles.sectionTitle} style={{ marginBottom: '24rpx' }}>选择您的身份</Text>
+        <Text className={styles.sectionTitle} style={{ marginBottom: '24rpx' }}>
+          {isEdit ? '编辑' : '选择'}您的身份
+        </Text>
         <View className={styles.typeCard}>
           {typeOptions.map((opt) => (
             <View
@@ -219,7 +268,7 @@ const PublishPage: React.FC = () => {
         <Button
           className={classnames(styles.submitBtn, !canSubmit && styles.disabled)}
           onClick={handleSubmit}
-        >立即发布</Button>
+        >{isEdit ? '保存修改' : '立即发布'}</Button>
       </View>
     </View>
   );

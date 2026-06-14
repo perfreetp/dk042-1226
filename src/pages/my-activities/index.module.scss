@@ -15,22 +15,30 @@
   background-color: $color-bg-card;
   margin: $spacing-lg 0 $spacing-md;
   border-radius: $radius-button;
-  padding: 6rpx;
+  padding: 8rpx;
   box-shadow: $shadow-card;
   overflow-x: auto;
+  gap: 6rpx;
+  @include scroll-x-container;
 }
 
 .tabItem {
   flex: 1;
-  min-width: 140rpx;
-  height: 72rpx;
+  min-width: 120rpx;
+  height: 88rpx;
   @include flex-center;
   border-radius: $radius-button;
   transition: all $transition-fast;
   flex-shrink: 0;
+  flex-direction: column;
+  gap: 4rpx;
+
+  .tabIcon {
+    font-size: 28rpx;
+  }
 
   .tabText {
-    font-size: $font-size-sm;
+    font-size: 22rpx;
     color: $color-text-secondary;
     white-space: nowrap;
   }
@@ -57,6 +65,10 @@
   overflow: hidden;
   transition: all $transition-base;
 
+  &.cardCancelled {
+    opacity: 0.7;
+  }
+
   &:active {
     transform: scale(0.98);
     opacity: 0.95;
@@ -77,6 +89,20 @@
     position: absolute;
     top: $spacing-sm;
     left: $spacing-sm;
+  }
+}
+
+.statusBadgeBig {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  padding: 8rpx 20rpx;
+  border-radius: $radius-button;
+  backdrop-filter: blur(8px);
+
+  .statusTextBig {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
   }
 }
 
@@ -110,6 +136,146 @@
   @include text-ellipsis;
 }
 
+.stageWrapper {
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, rgba($color-primary, 0.04) 0%, rgba($color-accent, 0.06) 100%);
+  border-radius: $radius-md;
+  border: 1rpx solid rgba($color-primary, 0.1);
+}
+
+.stageTimeline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  padding: 0 $spacing-sm;
+}
+
+.stageStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+
+  .stageDot {
+    width: 32rpx;
+    height: 32rpx;
+    border-radius: 50%;
+    border: 3rpx solid $color-border;
+    background-color: $color-bg-card;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 8rpx;
+    transition: all $transition-base;
+
+    &.done {
+      background-color: $color-success;
+      border-color: $color-success;
+    }
+
+    &.current {
+      background-color: $color-primary;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 8rpx rgba($color-primary, 0.15);
+    }
+
+    &.pending {
+      background-color: $color-bg-card;
+      border-color: $color-border;
+    }
+  }
+
+  .stageStepText {
+    font-size: 20rpx;
+    text-align: center;
+
+    &.text-done {
+      color: $color-success;
+      font-weight: $font-weight-medium;
+    }
+
+    &.text-current {
+      color: $color-primary;
+      font-weight: $font-weight-semibold;
+    }
+
+    &.text-pending {
+      color: $color-text-tertiary;
+    }
+  }
+
+  .stageLine {
+    position: absolute;
+    top: 16rpx;
+    left: 50%;
+    width: 100%;
+    height: 3rpx;
+
+    &.lineDone {
+      background-color: $color-success;
+    }
+
+    &.linePending {
+      background-color: $color-divider;
+    }
+  }
+}
+
+.stageCurrentInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.stageCurrentTag {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  border: 1rpx solid;
+  flex-shrink: 0;
+
+  .stageCurrentText {
+    font-size: 22rpx;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.stageCurrentDesc {
+  flex: 1;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.stageCancelled {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: rgba($color-error, 0.06);
+  border-radius: $radius-md;
+  border: 1rpx solid rgba($color-error, 0.15);
+  margin-bottom: $spacing-md;
+
+  .stageCancelledIcon {
+    font-size: 40rpx;
+  }
+
+  .stageCancelledLabel {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-error;
+    font-weight: $font-weight-semibold;
+  }
+
+  .stageCancelledDesc {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    margin-top: 4rpx;
+  }
+}
+
 .infoRow {
   display: flex;
   align-items: center;
@@ -123,11 +289,11 @@
   }
 }
 
-.cardBottom {
+.timeRow {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: $spacing-md;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin: $spacing-md 0;
   padding-top: $spacing-md;
   border-top: 1rpx solid $color-divider;
 }
@@ -135,6 +301,12 @@
 .regTime {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
+}
+
+.checkInTime {
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-medium;
 }
 
 .actionBtn {
@@ -155,6 +327,11 @@
     background-color: transparent;
     border: 1rpx solid $color-border;
     color: $color-text-secondary;
+
+    &.danger {
+      border-color: rgba($color-error, 0.4);
+      color: $color-error;
+    }
   }
 
   &.success {
@@ -180,7 +357,7 @@
 
 .statsRow {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background-color: $color-bg-card;
   border-radius: $radius-lg;
   padding: $spacing-lg 0;
@@ -193,21 +370,41 @@
   flex-direction: column;
   align-items: center;
   border-right: 1rpx solid $color-divider;
+  gap: 4rpx;
 
   &:last-child {
     border-right: none;
   }
 }
 
+.statBadge {
+  border-radius: 50%;
+  width: 60rpx;
+  height: 60rpx;
+  @include flex-center;
+  margin-bottom: 4rpx;
+
+  &.badgeActive {
+    background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.08) 100%);
+  }
+
+  &.badgeWait {
+    background: linear-gradient(135deg, rgba($color-warning, 0.15) 0%, rgba($color-warning, 0.08) 100%);
+  }
+
+  &.badgeCheck {
+    background: linear-gradient(135deg, rgba($color-success, 0.15) 0%, rgba($color-success, 0.08) 100%);
+  }
+}
+
 .statNum {
-  font-size: $font-size-xl;
+  font-size: 36rpx;
   font-weight: $font-weight-bold;
   color: $color-primary;
-  margin-bottom: 4rpx;
 }
 
 .statLabel {
-  font-size: $font-size-xs;
+  font-size: 20rpx;
   color: $color-text-tertiary;
 }
 
