@@ -1,0 +1,129 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.95;
+  }
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-right: $spacing-lg;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: $radius-lg;
+}
+
+.verifiedBadge {
+  position: absolute;
+  right: -6rpx;
+  bottom: -6rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: linear-gradient(135deg, $color-accent 0%, $color-accent-light 100%);
+  border-radius: $radius-round;
+  @include flex-center;
+  border: 3rpx solid $color-bg-card;
+
+  .verifiedText {
+    color: $color-text-white;
+    font-size: 20rpx;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.name {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  max-width: 300rpx;
+}
+
+.city {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.sizeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.sizeText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+}
+
+.star {
+  color: $color-accent;
+  font-size: $font-size-sm;
+  margin-right: 4rpx;
+}
+
+.ratingText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.reviewCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: 4rpx;
+}
+
+.stylesRow {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-sm;
+}
+
+.styleTag {
+  margin-right: $spacing-xs;
+  margin-top: 4rpx;
+}
+
+.worksRow {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.workThumb {
+  width: 120rpx;
+  height: 160rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}

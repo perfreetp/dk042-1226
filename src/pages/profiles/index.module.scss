@@ -1,0 +1,81 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.safetyBanner {
+  background: linear-gradient(135deg, $color-warning 0%, darken($color-warning, 8%) 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-top: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.safetyBannerTop {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.safetyIcon {
+  font-size: 36rpx;
+  margin-right: $spacing-sm;
+}
+
+.safetyBannerTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.safetyBannerText {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+.filterSection {
+  margin-bottom: $spacing-sm;
+}
+
+.filterLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.listWrapper {
+  margin-top: $spacing-md;
+}
+
+.sortTabs {
+  display: flex;
+  margin-bottom: $spacing-md;
+  gap: $spacing-md;
+}
+
+.sortTab {
+  padding: 8rpx 0;
+
+  .sortText {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+
+  &.active {
+    border-bottom: 3rpx solid $color-primary;
+
+    .sortText {
+      color: $color-primary;
+      font-weight: $font-weight-medium;
+    }
+  }
+}

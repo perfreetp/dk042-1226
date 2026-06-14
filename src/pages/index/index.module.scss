@@ -1,0 +1,126 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba($color-primary, 0.06) 0%, $color-bg-page 300rpx);
+  padding-bottom: 40rpx;
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.bannerSwiper {
+  width: 100%;
+  height: 340rpx;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-top: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.bannerItem {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+}
+
+.bannerOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: $spacing-lg;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%);
+}
+
+.bannerTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  margin-bottom: 6rpx;
+  display: block;
+}
+
+.bannerDesc {
+  font-size: $font-size-sm;
+  color: rgba(255,255,255,0.85);
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+  background-color: $color-bg-card;
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.categoryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+.categoryIcon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-lg;
+  @include flex-center;
+  margin-bottom: $spacing-sm;
+  font-size: 40rpx;
+
+  &.tea { background-color: $color-tag-tea; }
+  &.garden { background-color: $color-tag-garden; }
+  &.makeup { background-color: $color-tag-makeup; }
+  &.market { background-color: $color-tag-market; }
+}
+
+.categoryText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.cityBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-xl;
+  margin-bottom: $spacing-sm;
+}
+
+.cityLeft {
+  display: flex;
+  align-items: center;
+}
+
+.cityLabel {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.cityName {
+  font-size: $font-size-md;
+  color: $color-primary;
+  margin-left: $spacing-sm;
+  font-weight: $font-weight-medium;
+}
+
+.listWrapper {
+  margin-top: $spacing-md;
+}

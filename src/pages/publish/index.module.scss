@@ -1,0 +1,221 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 160rpx;
+}
+
+.content {
+  padding: $spacing-lg $page-padding;
+}
+
+.typeCard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.typeItem {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg $spacing-sm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2rpx solid transparent;
+  box-shadow: $shadow-card;
+  transition: all $transition-fast;
+
+  &.active {
+    border-color: $color-primary;
+    background-color: rgba($color-primary, 0.04);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.typeIcon {
+  font-size: 48rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.typeLabel {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.formSection {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.required {
+  color: $color-error;
+  margin-right: 4rpx;
+}
+
+.formInput {
+  width: 100%;
+  height: 88rpx;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  border: 1rpx solid transparent;
+  transition: all $transition-fast;
+
+  &::placeholder {
+    color: $color-text-disabled;
+  }
+}
+
+.formTextarea {
+  width: 100%;
+  min-height: 200rpx;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: 1.6;
+  border: 1rpx solid transparent;
+  transition: all $transition-fast;
+
+  &::placeholder {
+    color: $color-text-disabled;
+  }
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tagItem {
+  padding: 12rpx 24rpx;
+  background-color: $color-bg-page;
+  border-radius: $radius-button;
+  border: 1rpx solid transparent;
+  transition: all $transition-fast;
+
+  .tagText {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
+
+  &.active {
+    background-color: rgba($color-primary, 0.1);
+    border-color: $color-primary;
+
+    .tagText {
+      color: $color-primary;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.safetyCard {
+  background: linear-gradient(135deg, rgba($color-warning, 0.08) 0%, rgba($color-primary, 0.05) 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-top: $spacing-md;
+  border: 1rpx solid rgba($color-warning, 0.2);
+}
+
+.safetyTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-warning;
+  margin-bottom: $spacing-sm;
+}
+
+.safetyList {
+  padding-left: 4rpx;
+}
+
+.safetyItem {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.8;
+  padding-left: 32rpx;
+  position: relative;
+  margin-bottom: 4rpx;
+
+  &::before {
+    content: '•';
+    position: absolute;
+    left: 8rpx;
+    color: $color-warning;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-button;
+  box-shadow: 0 4rpx 16rpx rgba($color-primary, 0.25);
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  &.disabled {
+    background-color: $color-bg-hover;
+    color: $color-text-disabled;
+    box-shadow: none;
+  }
+}

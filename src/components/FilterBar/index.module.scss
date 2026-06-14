@@ -1,0 +1,46 @@
+@use '@/styles/variables.scss' as *;
+
+.scrollWrapper {
+  width: 100%;
+  @include scroll-x-container;
+}
+
+.wrapper {
+  display: inline-flex;
+  padding: $spacing-sm 0;
+  gap: $spacing-sm;
+  white-space: nowrap;
+}
+
+.item {
+  @include scroll-x-item(auto);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 28rpx;
+  background-color: $color-bg-card;
+  border-radius: $radius-button;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    box-shadow: 0 4rpx 12rpx rgba($color-primary, 0.25);
+  }
+
+  .text {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    white-space: nowrap;
+  }
+
+  .activeText {
+    color: $color-text-white;
+    font-weight: $font-weight-medium;
+  }
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.96);
+  }
+}

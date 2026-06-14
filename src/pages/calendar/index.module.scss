@@ -1,0 +1,154 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.calendarCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-top: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.monthText {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.navBtn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+  @include flex-center;
+
+  .navText {
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+  }
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.weekRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: $spacing-sm;
+}
+
+.weekText {
+  text-align: center;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  padding: $spacing-sm 0;
+}
+
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4rpx;
+}
+
+.dayCell {
+  aspect-ratio: 1;
+  @include flex-center;
+  flex-direction: column;
+  border-radius: $radius-sm;
+  position: relative;
+  transition: all $transition-fast;
+
+  &.empty {
+    visibility: hidden;
+  }
+
+  &.today {
+    background-color: rgba($color-primary, 0.08);
+  }
+
+  &.selected {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+
+    .dayText {
+      color: $color-text-white;
+      font-weight: $font-weight-semibold;
+    }
+
+    .dot {
+      background-color: $color-text-white;
+    }
+  }
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+}
+
+.dayText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: $radius-round;
+  background-color: $color-primary;
+  margin-top: 4rpx;
+}
+
+.filterSection {
+  margin-top: $spacing-lg;
+}
+
+.filterGroup {
+  margin-bottom: $spacing-md;
+}
+
+.filterLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.dayInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-lg;
+  margin-bottom: $spacing-sm;
+}
+
+.dayInfoText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.dayCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.listWrapper {
+  margin-top: $spacing-sm;
+}

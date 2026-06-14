@@ -1,0 +1,195 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.tabBar {
+  display: flex;
+  background-color: $color-bg-card;
+  margin: $spacing-lg 0 $spacing-md;
+  border-radius: $radius-button;
+  padding: 6rpx;
+  box-shadow: $shadow-card;
+  overflow-x: auto;
+}
+
+.tabItem {
+  flex: 1;
+  min-width: 140rpx;
+  height: 72rpx;
+  @include flex-center;
+  border-radius: $radius-button;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+
+  .tabText {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    white-space: nowrap;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+
+    .tabText {
+      color: $color-text-white;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.regCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.95;
+  }
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.statusBadge {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+
+  .statusText {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.title {
+  flex: 1;
+  margin-right: $spacing-md;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+
+  .infoText {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    @include text-ellipsis;
+    flex: 1;
+  }
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.regTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.actionBtn {
+  @include button-reset;
+  height: $button-height-sm;
+  padding: 0 $spacing-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    color: $color-text-white;
+  }
+
+  &.outline {
+    background-color: transparent;
+    border: 1rpx solid $color-border;
+    color: $color-text-secondary;
+  }
+
+  &.success {
+    background: linear-gradient(135deg, $color-success 0%, lighten($color-success, 10%) 100%);
+    color: $color-text-white;
+  }
+
+  &.warning {
+    background: linear-gradient(135deg, $color-warning 0%, lighten($color-warning, 8%) 100%);
+    color: $color-text-white;
+  }
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.96);
+  }
+}
+
+.btnGroup {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg 0;
+  margin-top: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.statNum {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.listWrapper {
+  margin-top: $spacing-md;
+}

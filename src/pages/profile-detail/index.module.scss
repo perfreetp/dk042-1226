@@ -1,0 +1,345 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+.headerCard {
+  background: linear-gradient(135deg, rgba($color-primary, 0.12) 0%, rgba($color-accent, 0.06) 100%);
+  padding: $spacing-xl $page-padding;
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-right: $spacing-lg;
+}
+
+.avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-lg;
+  border: 4rpx solid $color-bg-card;
+}
+
+.verifiedBadge {
+  position: absolute;
+  right: -6rpx;
+  bottom: -6rpx;
+  width: 44rpx;
+  height: 44rpx;
+  background: linear-gradient(135deg, $color-accent 0%, $color-accent-light 100%);
+  border-radius: $radius-round;
+  @include flex-center;
+  border: 4rpx solid $color-bg-card;
+
+  .verifiedText {
+    color: $color-text-white;
+    font-size: 22rpx;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.name {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+}
+
+.cityText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-sm;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.stars {
+  margin-right: $spacing-sm;
+}
+
+.star {
+  color: $color-accent;
+  font-size: $font-size-md;
+  margin-right: 2rpx;
+}
+
+.ratingNum {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: 8rpx;
+}
+
+.reviewCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.bioText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-top: $spacing-md;
+}
+
+.contentSection {
+  padding: 0 $page-padding;
+}
+
+.sectionCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-top: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+}
+
+.sectionIcon {
+  margin-right: $spacing-xs;
+}
+
+.sizeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+}
+
+.sizeItem {
+  text-align: center;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-sm;
+}
+
+.sizeLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+  display: block;
+}
+
+.sizeValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.stylesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.worksGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xs;
+}
+
+.workItem {
+  aspect-ratio: 3 / 4;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.workImage {
+  width: 100%;
+  height: 100%;
+}
+
+.reviewItem {
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
+.reviewHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.reviewerAvatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-sm;
+}
+
+.reviewerInfo {
+  flex: 1;
+}
+
+.reviewerName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 2rpx;
+  display: block;
+}
+
+.reviewMeta {
+  display: flex;
+  align-items: center;
+}
+
+.reviewStars {
+  margin-right: $spacing-sm;
+}
+
+.reviewStar {
+  color: $color-accent;
+  font-size: $font-size-xs;
+}
+
+.reviewTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.verifiedTag {
+  font-size: 20rpx;
+  color: $color-success;
+  background-color: rgba($color-success, 0.1);
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  margin-left: $spacing-sm;
+}
+
+.reviewContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.7;
+}
+
+.safetyCard {
+  background: linear-gradient(135deg, rgba($color-warning, 0.08) 0%, rgba($color-error, 0.05) 100%);
+  border: 1rpx solid rgba($color-warning, 0.2);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-top: $spacing-md;
+}
+
+.safetyTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-warning;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+}
+
+.safetyList {
+  padding-left: 4rpx;
+}
+
+.safetyItem {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.8;
+  padding-left: 36rpx;
+  position: relative;
+  margin-bottom: 4rpx;
+
+  &::before {
+    content: '•';
+    position: absolute;
+    left: 12rpx;
+    color: $color-warning;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-fast;
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    color: $color-text-white;
+    box-shadow: 0 4rpx 16rpx rgba($color-primary, 0.25);
+  }
+
+  &.outline {
+    background-color: transparent;
+    border: 1rpx solid $color-border;
+    color: $color-text-secondary;
+  }
+
+  &.danger {
+    background-color: transparent;
+    border: 1rpx solid rgba($color-error, 0.3);
+    color: $color-error;
+  }
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}

@@ -1,0 +1,62 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  white-space: nowrap;
+
+  &.size-sm {
+    padding: 4rpx 12rpx;
+  }
+
+  &.size-md {
+    padding: 8rpx 20rpx;
+  }
+
+  .text {
+    font-size: $font-size-xs;
+    line-height: 1.4;
+  }
+
+  &.type-default {
+    background-color: $color-bg-hover;
+    .text { color: $color-text-secondary; }
+  }
+
+  &.type-primary {
+    background-color: rgba($color-primary, 0.1);
+    .text { color: $color-primary; }
+  }
+
+  &.type-success {
+    background-color: rgba($color-success, 0.1);
+    .text { color: $color-success; }
+  }
+
+  &.type-warning {
+    background-color: rgba($color-warning, 0.1);
+    .text { color: $color-warning; }
+  }
+
+  &.type-tea {
+    background-color: $color-tag-tea;
+    .text { color: $color-tag-tea-text; }
+  }
+
+  &.type-garden {
+    background-color: $color-tag-garden;
+    .text { color: $color-tag-garden-text; }
+  }
+
+  &.type-makeup {
+    background-color: $color-tag-makeup;
+    .text { color: $color-tag-makeup-text; }
+  }
+
+  &.type-market {
+    background-color: $color-tag-market;
+    .text { color: $color-tag-market-text; }
+  }
+}
