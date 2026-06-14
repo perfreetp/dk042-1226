@@ -1,19 +1,36 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Image, Button, ScrollView } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import Tag from '@/components/Tag';
-import { activities, activityTypeTextMap, dynastyTextMap } from '@/data/activities';
-import { Activity } from '@/types/activity';
+import { useActivityStore } from '@/stores/activity';
+import { activityTypeTextMap, dynastyTextMap } from '@/data/activities';
+import { RegisterStatus } from '@/types/activity';
 import styles from './index.module.scss';
 
-type RegisterState = 'none' | 'registered' | 'waiting' | 'checkedIn';
+type RegisterState = RegisterStatus | 'none';
 
 const ActivityDetailPage: React.FC = () => {
   const router = useRouter();
   const id = router.params.id || '1';
-  const activity = activities.find((a: Activity) => a.id === id) || activities[0];
-  const [registerState, setRegisterState] = useState<RegisterState>('none');
+
+  const activities = useActivityStore(state => state.activities);
+  const registerActivity = useActivityStore(state => state.registerActivity);
+  const joinWaiting = useActivityStore(state => state.joinWaiting);
+  const cancelRegistration = useActivityStore(state => state.cancelRegistration);
+  const checkIn = useActivityStore(state => state.checkIn);
+  const uploadAlbum = useActivityStore(state => state.uploadAlbum);
+  const getRegistrationByActivityId = useActivityStore(state => state.getRegistrationByActivityId);
+
+  const activity = useMemo(() => {
+    return activities.find(a => a.id === id) || activities[0];
+  }, [activities, id]);
+
+  const registration = useMemo(() => {
+    return getRegistrationByActivityId(id);
+  }, [getRegistrationByActivityId, id]);
+
+  const registerState: RegisterState = registration ? registration.status : 'none';
 
   const isFull = activity.registeredPeople >= activity.maxPeople;
 
@@ -26,8 +43,8 @@ const ActivityDetailPage: React.FC = () => {
         confirmColor: '#D4985A'
       }).then((res) => {
         if (res.confirm) {
-          setRegisterState('waiting');
-          Taro.showToast({ title: '候补成功', icon: 'success' });
+          const result = joinWaiting(id);
+          Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
         }
       }).catch(() => {});
     } else {
@@ -37,41 +54,59 @@ const ActivityDetailPage: React.FC = () => {
         confirmColor: '#8B4557'
       }).then((res) => {
         if (res.confirm) {
-          setRegisterState('registered');
-          Taro.showToast({ title: '报名成功', icon: 'success' });
+          const result = registerActivity(id);
+          Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
         }
       }).catch(() => {});
     }
   };
 
   const handleCancel = () => {
+    if (!registration) return;
     Taro.showModal({
       title: '取消报名',
       content: '确认取消该活动的报名？',
       confirmColor: '#C2575A'
     }).then((res) => {
       if (res.confirm) {
-        setRegisterState('none');
-        Taro.showToast({ title: '已取消报名', icon: 'none' });
+        const result = cancelRegistration(registration.id);
+        Taro.showToast({ title: result.message, icon: 'none' });
       }
     }).catch(() => {});
   };
 
   const handleCheckIn = () => {
+    if (!registration) return;
     Taro.showModal({
       title: '活动签到',
       content: '请确认已到达活动现场，签到后将记录您的参与。',
       confirmColor: '#8B4557'
     }).then((res) => {
       if (res.confirm) {
-        setRegisterState('checkedIn');
-        Taro.showToast({ title: '签到成功', icon: 'success' });
+        const result = checkIn(registration.id);
+        Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
       }
     }).catch(() => {});
   };
 
   const handleUploadAlbum = () => {
-    Taro.showToast({ title: '打开相册上传图片', icon: 'none' });
+    Taro.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempFilePaths = res.tempFilePaths;
+        if (tempFilePaths && tempFilePaths.length > 0) {
+          const result = uploadAlbum(id, tempFilePaths[0]);
+          Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
+        }
+      },
+      fail: () => {
+        const mockImage = `https://picsum.photos/id/${Math.floor(Math.random() * 100) + 200}/400/400`;
+        const result = uploadAlbum(id, mockImage);
+        Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
+      }
+    });
   };
 
   const handleContact = () => {
@@ -119,6 +154,12 @@ const ActivityDetailPage: React.FC = () => {
             >立即签到</Button>
           )}
           {registerState === 'checkedIn' && (
+            <Button
+              className={classnames(styles.actionBtn, styles.primary)}
+              onClick={handleUploadAlbum}
+            >📷 上传相册</Button>
+          )}
+          {registerState === 'completed' && (
             <Button
               className={classnames(styles.actionBtn, styles.primary)}
               onClick={handleUploadAlbum}

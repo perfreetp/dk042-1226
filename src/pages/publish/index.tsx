@@ -3,6 +3,7 @@ import { View, Text, Input, Textarea, Button } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import { ShootRole } from '@/types/photoshoot';
+import { usePhotoshootStore } from '@/stores/photoshoot';
 import { safetyTips } from '@/data/profiles';
 import { cities } from '@/data/activities';
 import styles from './index.module.scss';
@@ -19,6 +20,12 @@ const styleOptions = [
   '男装', '娇小型', '可爱风', '侠客风'
 ];
 
+const roleCoverImages: Record<ShootRole, string> = {
+  photographer: 'https://picsum.photos/id/1025/750/500',
+  stylist: 'https://picsum.photos/id/225/750/500',
+  model: 'https://picsum.photos/id/1027/750/500'
+};
+
 const PublishPage: React.FC = () => {
   const [role, setRole] = useState<ShootRole>('photographer');
   const [title, setTitle] = useState('');
@@ -28,6 +35,7 @@ const PublishPage: React.FC = () => {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [description, setDescription] = useState('');
   const [contact, setContact] = useState('');
+  const addPhotoshoot = usePhotoshootStore(state => state.addPhotoshoot);
 
   const canSubmit = title.trim() && city.trim() && date.trim() && budget.trim() && contact.trim();
 
@@ -62,13 +70,27 @@ const PublishPage: React.FC = () => {
     }).then((res) => {
       if (res.confirm) {
         Taro.showLoading({ title: '发布中...' });
+        const result = addPhotoshoot({
+          role,
+          title: title.trim(),
+          coverImage: roleCoverImages[role],
+          city: city.trim(),
+          date: date.trim(),
+          budget: budget.trim(),
+          description: description.trim() || '暂无详细描述',
+          style: selectedStyles.length > 0 ? selectedStyles : ['汉服'],
+          contact: contact.trim(),
+          authorName: '我'
+        });
         setTimeout(() => {
           Taro.hideLoading();
-          Taro.showToast({ title: '发布成功', icon: 'success' });
-          setTimeout(() => {
-            Taro.navigateBack();
-          }, 1500);
-        }, 1000);
+          Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
+          if (result.success) {
+            setTimeout(() => {
+              Taro.navigateBack();
+            }, 1000);
+          }
+        }, 600);
       }
     }).catch(() => {});
   };

@@ -21,16 +21,9 @@ const ProfileDetailPage: React.FC = () => {
   const [isBlocked, setIsBlocked] = useState(false);
 
   const handleMessage = () => {
-    Taro.showModal({
-      title: '发起私信',
-      content: `确定要向「${profile.name}」发送私信吗？\n\n请友好交流，尊重他人。涉及线下见面请务必注意安全。`,
-      confirmText: '去私信',
-      confirmColor: '#8B4557'
-    }).then((res) => {
-      if (res.confirm) {
-        Taro.showToast({ title: '功能开发中', icon: 'none' });
-      }
-    }).catch(() => {});
+    Taro.navigateTo({
+      url: `/pages/chat/index?targetId=${profile.id}&targetName=${encodeURIComponent(profile.name)}&targetAvatar=${encodeURIComponent(profile.avatar)}`
+    });
   };
 
   const handleReport = () => {

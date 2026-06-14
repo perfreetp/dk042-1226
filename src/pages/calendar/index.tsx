@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { View, Text } from '@tarojs/components';
 import ActivityCard from '@/components/ActivityCard';
 import FilterBar from '@/components/FilterBar';
-import { activities, cities, dynasties } from '@/data/activities';
+import { useActivityStore } from '@/stores/activity';
+import { cities, dynasties, activityTypes } from '@/data/activities';
 import { Activity } from '@/types/activity';
 import styles from './index.module.scss';
 
@@ -14,18 +15,31 @@ interface DayItem {
 
 const CalendarPage: React.FC = () => {
   const now = new Date();
+  const activities = useActivityStore(state => state.activities);
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<number | null>(now.getDate());
   const [currentCity, setCurrentCity] = useState('全部');
   const [currentDynasty, setCurrentDynasty] = useState('any');
+  const [currentType, setCurrentType] = useState('all');
 
   const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+
+  const filterActivities = (list: Activity[]) => {
+    return list.filter((a: Activity) => {
+      const cityMatch = currentCity === '全部' || a.city === currentCity;
+      const dynastyMatch = currentDynasty === 'any' || a.dynasty === currentDynasty;
+      const typeMatch = currentType === 'all' || a.type === currentType;
+      return cityMatch && dynastyMatch && typeMatch;
+    });
+  };
 
   const calendarDays = useMemo(() => {
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const result: DayItem[] = [];
+
+    const filtered = filterActivities(activities);
 
     for (let i = 0; i < firstDay; i++) {
       result.push({ day: 0, isEmpty: true, hasActivity: false });
@@ -33,12 +47,12 @@ const CalendarPage: React.FC = () => {
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const hasActivity = activities.some((a: Activity) => a.date === dateStr);
+      const hasActivity = filtered.some((a: Activity) => a.date === dateStr);
       result.push({ day: d, isEmpty: false, hasActivity });
     }
 
     return result;
-  }, [currentYear, currentMonth]);
+  }, [currentYear, currentMonth, activities, currentCity, currentDynasty, currentType]);
 
   const selectedDateStr = useMemo(() => {
     if (!selectedDay) return null;
@@ -51,13 +65,12 @@ const CalendarPage: React.FC = () => {
   }, []);
 
   const filteredActivities = useMemo(() => {
-    return activities.filter((a: Activity) => {
-      const dateMatch = !selectedDateStr || a.date === selectedDateStr;
-      const cityMatch = currentCity === '全部' || a.city === currentCity;
-      const dynastyMatch = currentDynasty === 'any' || a.dynasty === currentDynasty;
-      return dateMatch && cityMatch && dynastyMatch;
-    });
-  }, [selectedDateStr, currentCity, currentDynasty]);
+    let result = filterActivities(activities);
+    if (selectedDateStr) {
+      result = result.filter(a => a.date === selectedDateStr);
+    }
+    return result;
+  }, [activities, selectedDateStr, currentCity, currentDynasty, currentType]);
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -106,7 +119,8 @@ const CalendarPage: React.FC = () => {
               if (item.isEmpty) {
                 return <View key={idx} className={`${styles.dayCell} ${styles.empty}`}></View>;
               }
-              const isToday = selectedDateStr && todayStr === `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`;
+              const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`;
+              const isToday = todayStr === dateStr;
               const isSelected = selectedDay === item.day;
               return (
                 <View
@@ -129,6 +143,14 @@ const CalendarPage: React.FC = () => {
               options={cityOptions}
               value={currentCity}
               onChange={setCurrentCity}
+            />
+          </View>
+          <View className={styles.filterGroup}>
+            <Text className={styles.filterLabel}>活动类型</Text>
+            <FilterBar
+              options={activityTypes}
+              value={currentType}
+              onChange={setCurrentType}
             />
           </View>
           <View className={styles.filterGroup}>
@@ -155,7 +177,9 @@ const CalendarPage: React.FC = () => {
             ))
           ) : (
             <View style={{ padding: '80rpx 0', textAlign: 'center' }}>
-              <Text style={{ fontSize: '28rpx', color: '#A09383' }}>当日暂无活动，换个日期看看吧</Text>
+              <Text style={{ fontSize: '28rpx', color: '#A09383' }}>
+                {selectedDateStr ? '当日暂无活动，换个日期看看吧' : '暂无符合条件的活动'}
+              </Text>
             </View>
           )}
         </View>

@@ -52,15 +52,36 @@
 .regCard {
   background-color: $color-bg-card;
   border-radius: $radius-lg;
-  padding: $spacing-lg;
   margin-bottom: $spacing-md;
   box-shadow: $shadow-card;
+  overflow: hidden;
   transition: all $transition-base;
 
   &:active {
     transform: scale(0.98);
     opacity: 0.95;
   }
+}
+
+.cardCover {
+  position: relative;
+  width: 100%;
+  height: 240rpx;
+
+  .coverImage {
+    width: 100%;
+    height: 100%;
+  }
+
+  .typeTag {
+    position: absolute;
+    top: $spacing-sm;
+    left: $spacing-sm;
+  }
+}
+
+.cardContent {
+  padding: $spacing-lg;
 }
 
 .cardTop {

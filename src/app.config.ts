@@ -7,7 +7,9 @@ export default defineAppConfig({
     'pages/my-activities/index',
     'pages/activity-detail/index',
     'pages/publish/index',
-    'pages/profile-detail/index'
+    'pages/profile-detail/index',
+    'pages/messages/index',
+    'pages/chat/index'
   ],
   window: {
     backgroundTextStyle: 'light',

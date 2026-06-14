@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import PhotoshootCard from '@/components/PhotoshootCard';
 import FilterBar from '@/components/FilterBar';
-import { photoshoots } from '@/data/photoshoots';
+import { usePhotoshootStore } from '@/stores/photoshoot';
 import { cities } from '@/data/activities';
 import { ShootRole, Photoshoot } from '@/types/photoshoot';
 import { safetyTips } from '@/data/profiles';
@@ -20,6 +20,7 @@ const tabs = [
 const SquarePage: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('all');
   const [currentCity, setCurrentCity] = useState('全部');
+  const photoshoots = usePhotoshootStore(state => state.photoshoots);
 
   const filteredShoots = useMemo(() => {
     return photoshoots.filter((p: Photoshoot) => {
@@ -27,7 +28,7 @@ const SquarePage: React.FC = () => {
       const cityMatch = currentCity === '全部' || p.city === currentCity;
       return tabMatch && cityMatch;
     });
-  }, [currentTab, currentCity]);
+  }, [photoshoots, currentTab, currentCity]);
 
   const cityOptions = cities.map((c) => ({ value: c, label: c }));
 

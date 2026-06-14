@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, Swiper, SwiperItem, Image } from '@tarojs/components';
-import Taro, { useDidShow } from '@tarojs/taro';
+import Taro from '@tarojs/taro';
 import SectionHeader from '@/components/SectionHeader';
 import ActivityCard from '@/components/ActivityCard';
 import FilterBar from '@/components/FilterBar';
-import { activities, cities, activityTypes } from '@/data/activities';
+import { useActivityStore } from '@/stores/activity';
+import { cities, activityTypes } from '@/data/activities';
 import { Activity } from '@/types/activity';
 import styles from './index.module.scss';
 
@@ -39,6 +40,7 @@ const categoryData = [
 const IndexPage: React.FC = () => {
   const [currentCity, setCurrentCity] = useState('全部');
   const [currentType, setCurrentType] = useState('all');
+  const activities = useActivityStore(state => state.activities);
 
   const filteredActivities = useMemo(() => {
     return activities.filter((a: Activity) => {
@@ -46,7 +48,7 @@ const IndexPage: React.FC = () => {
       const typeMatch = currentType === 'all' || a.type === currentType;
       return cityMatch && typeMatch;
     });
-  }, [currentCity, currentType]);
+  }, [activities, currentCity, currentType]);
 
   const handleCategoryClick = (key: string) => {
     setCurrentType(key);

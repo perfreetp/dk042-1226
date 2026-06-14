@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, Button } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import { View, Text, Button, Image } from '@tarojs/components';
+import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
-import { myRegistrations, statusTextMap, statusColorMap } from '@/data/activities';
+import { useActivityStore } from '@/stores/activity';
+import { statusTextMap, statusColorMap, activityTypeTextMap } from '@/data/activities';
 import { RegisterStatus, MyRegistration } from '@/types/activity';
+import Tag from '@/components/Tag';
 import styles from './index.module.scss';
 
 const tabs = [
@@ -11,26 +13,29 @@ const tabs = [
   { value: 'registered', label: '已报名' },
   { value: 'waiting', label: '候补' },
   { value: 'checkedIn', label: '已签到' },
-  { value: 'completed', label: '已完成' }
+  { value: 'cancelled', label: '已取消' }
 ];
 
 const MyActivitiesPage: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('all');
+  const registrations = useActivityStore(state => state.registrations);
+  const cancelRegistration = useActivityStore(state => state.cancelRegistration);
+  const checkIn = useActivityStore(state => state.checkIn);
+  const uploadAlbum = useActivityStore(state => state.uploadAlbum);
 
-  const filteredRegs = useMemo(() => {
-    return myRegistrations.filter((r: MyRegistration) => {
-      return currentTab === 'all' || r.status === currentTab;
-    });
-  }, [currentTab]);
+  const validRegs = useMemo(() => {
+    if (currentTab === 'all') return registrations;
+    return registrations.filter(r => r.status === currentTab);
+  }, [registrations, currentTab]);
 
   const stats = useMemo(() => {
     return {
-      total: myRegistrations.length,
-      registered: myRegistrations.filter((r) => r.status === 'registered').length,
-      waiting: myRegistrations.filter((r) => r.status === 'waiting').length,
-      completed: myRegistrations.filter((r) => r.status === 'completed' || r.status === 'checkedIn').length
+      total: registrations.filter(r => r.status !== 'cancelled').length,
+      registered: registrations.filter(r => r.status === 'registered').length,
+      waiting: registrations.filter(r => r.status === 'waiting').length,
+      completed: registrations.filter(r => r.status === 'completed' || r.status === 'checkedIn').length
     };
-  }, []);
+  }, [registrations]);
 
   const handleCardClick = (reg: MyRegistration) => {
     Taro.navigateTo({
@@ -38,33 +43,62 @@ const MyActivitiesPage: React.FC = () => {
     });
   };
 
-  const handleAction = (action: string, reg: MyRegistration) => {
-    const actionMap: Record<string, string> = {
-      cancel: '确认取消报名该活动？',
-      checkIn: '确认签到？请确保已到达活动现场',
-      upload: '打开相册选择图片上传',
-      contact: '联系主办方：' + reg.activity.organizer.contact
-    };
+  const handleCancel = (e, reg: MyRegistration) => {
+    e.stopPropagation();
+    Taro.showModal({
+      title: '取消报名',
+      content: '确认取消报名该活动？',
+      confirmColor: '#C2575A'
+    }).then((res) => {
+      if (res.confirm) {
+        const result = cancelRegistration(reg.id);
+        Taro.showToast({ title: result.message, icon: 'none' });
+      }
+    }).catch(() => {});
+  };
 
-    if (action === 'cancel') {
-      Taro.showModal({
-        title: '取消报名',
-        content: actionMap[action],
-        confirmColor: '#C2575A'
-      }).then((res) => {
-        if (res.confirm) {
-          Taro.showToast({ title: '已取消报名', icon: 'success' });
+  const handleCheckIn = (e, reg: MyRegistration) => {
+    e.stopPropagation();
+    Taro.showModal({
+      title: '活动签到',
+      content: '请确认已到达活动现场，签到后将记录您的参与。',
+      confirmColor: '#8B4557'
+    }).then((res) => {
+      if (res.confirm) {
+        const result = checkIn(reg.id);
+        Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
+      }
+    }).catch(() => {});
+  };
+
+  const handleUploadAlbum = (e, reg: MyRegistration) => {
+    e.stopPropagation();
+    Taro.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempFilePaths = res.tempFilePaths;
+        if (tempFilePaths && tempFilePaths.length > 0) {
+          const result = uploadAlbum(reg.activityId, tempFilePaths[0]);
+          Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
         }
-      }).catch(() => {});
-    } else if (action === 'contact') {
-      Taro.showModal({
-        title: '联系方式',
-        content: actionMap[action],
-        showCancel: false
-      });
-    } else {
-      Taro.showToast({ title: actionMap[action] || '操作成功', icon: 'none' });
-    }
+      },
+      fail: () => {
+        const mockImage = `https://picsum.photos/id/${Math.floor(Math.random() * 100) + 250}/400/400`;
+        const result = uploadAlbum(reg.activityId, mockImage);
+        Taro.showToast({ title: result.message, icon: result.success ? 'success' : 'none' });
+      }
+    });
+  };
+
+  const handleContact = (e, reg: MyRegistration) => {
+    e.stopPropagation();
+    Taro.showModal({
+      title: '主办方联系方式',
+      content: reg.activity.organizer.contact,
+      showCancel: false
+    });
   };
 
   const renderActions = (reg: MyRegistration) => {
@@ -74,11 +108,11 @@ const MyActivitiesPage: React.FC = () => {
           <View className={styles.btnGroup}>
             <Button
               className={classnames(styles.actionBtn, styles.outline)}
-              onClick={(e) => { e.stopPropagation(); handleAction('cancel', reg); }}
+              onClick={(e) => handleCancel(e, reg)}
             >取消报名</Button>
             <Button
               className={classnames(styles.actionBtn, styles.primary)}
-              onClick={(e) => { e.stopPropagation(); handleAction('checkIn', reg); }}
+              onClick={(e) => handleCheckIn(e, reg)}
             >立即签到</Button>
           </View>
         );
@@ -86,16 +120,22 @@ const MyActivitiesPage: React.FC = () => {
         return (
           <Button
             className={classnames(styles.actionBtn, styles.outline)}
-            onClick={(e) => { e.stopPropagation(); handleAction('cancel', reg); }}
+            onClick={(e) => handleCancel(e, reg)}
           >取消候补</Button>
         );
       case 'checkedIn':
       case 'completed':
         return (
-          <Button
-            className={classnames(styles.actionBtn, styles.success)}
-            onClick={(e) => { e.stopPropagation(); handleAction('upload', reg); }}
-          >📷 上传相册</Button>
+          <View className={styles.btnGroup}>
+            <Button
+              className={classnames(styles.actionBtn, styles.outline)}
+              onClick={(e) => handleContact(e, reg)}
+            >联系主办方</Button>
+            <Button
+              className={classnames(styles.actionBtn, styles.success)}
+              onClick={(e) => handleUploadAlbum(e, reg)}
+            >📷 上传相册</Button>
+          </View>
         );
       default:
         return null;
@@ -137,41 +177,53 @@ const MyActivitiesPage: React.FC = () => {
         </View>
 
         <View className={styles.listWrapper}>
-          {filteredRegs.length > 0 ? (
-            filteredRegs.map((reg) => (
+          {validRegs.length > 0 ? (
+            validRegs.map((reg) => (
               <View
                 key={reg.id}
                 className={styles.regCard}
                 onClick={() => handleCardClick(reg)}
               >
-                <View className={styles.cardTop}>
-                  <Text className={styles.title}>{reg.activity.title}</Text>
-                  <View
-                    className={styles.statusBadge}
-                    style={{ backgroundColor: `${statusColorMap[reg.status]}20` }}
-                  >
-                    <Text
-                      className={styles.statusText}
-                      style={{ color: statusColorMap[reg.status] }}
-                    >
-                      {statusTextMap[reg.status]}
-                    </Text>
+                <View className={styles.cardCover}>
+                  <Image
+                    className={styles.coverImage}
+                    src={reg.activity.coverImage}
+                    mode="aspectFill"
+                  />
+                  <View className={styles.typeTag}>
+                    <Tag text={activityTypeTextMap[reg.activity.type]} type={reg.activity.type as any} size="sm" />
                   </View>
                 </View>
-                <View className={styles.infoRow}>
-                  <Text className={styles.infoText}>📍 {reg.activity.city} · {reg.activity.location}</Text>
-                </View>
-                <View className={styles.infoRow}>
-                  <Text className={styles.infoText}>📅 {reg.activity.date} {reg.activity.gatherTime}集合</Text>
-                </View>
-                <View className={styles.infoRow}>
-                  <Text className={styles.infoText}>
-                    💰 {reg.activity.fee > 0 ? `¥${reg.activity.fee}/人` : '免费活动'}
-                  </Text>
-                </View>
-                <View className={styles.cardBottom}>
-                  <Text className={styles.regTime}>报名时间：{reg.registerTime}</Text>
-                  {renderActions(reg)}
+                <View className={styles.cardContent}>
+                  <View className={styles.cardTop}>
+                    <Text className={styles.title}>{reg.activity.title}</Text>
+                    <View
+                      className={styles.statusBadge}
+                      style={{ backgroundColor: `${statusColorMap[reg.status]}20` }}
+                    >
+                      <Text
+                        className={styles.statusText}
+                        style={{ color: statusColorMap[reg.status] }}
+                      >
+                        {statusTextMap[reg.status]}
+                      </Text>
+                    </View>
+                  </View>
+                  <View className={styles.infoRow}>
+                    <Text className={styles.infoText}>📍 {reg.activity.city} · {reg.activity.location}</Text>
+                  </View>
+                  <View className={styles.infoRow}>
+                    <Text className={styles.infoText}>📅 {reg.activity.date} {reg.activity.gatherTime}集合</Text>
+                  </View>
+                  <View className={styles.infoRow}>
+                    <Text className={styles.infoText}>
+                      💰 {reg.activity.fee > 0 ? `¥${reg.activity.fee}/人` : '免费活动'}
+                    </Text>
+                  </View>
+                  <View className={styles.cardBottom}>
+                    <Text className={styles.regTime}>报名时间：{reg.registerTime}</Text>
+                    {renderActions(reg)}
+                  </View>
                 </View>
               </View>
             ))
